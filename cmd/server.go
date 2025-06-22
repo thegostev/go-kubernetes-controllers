@@ -49,7 +49,10 @@ func startServer() {
 		ctx.SetContentType("text/plain; charset=utf-8")
 
 		// Send response
-		ctx.WriteString("Hello from FastHTTP!")
+		if _, err := ctx.WriteString("Hello from FastHTTP!"); err != nil {
+			log.Error().Err(err).Msg("Failed to write response")
+			return
+		}
 
 		log.Debug().
 			Str("method", string(ctx.Method())).

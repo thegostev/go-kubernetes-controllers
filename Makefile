@@ -40,7 +40,11 @@ test-coverage: ## Run tests with coverage
 
 lint: ## Run linter
 	@echo "Running linter..."
-	golangci-lint run
+	@if command -v golangci-lint >/dev/null 2>&1; then \
+		golangci-lint run; \
+	else \
+		echo "golangci-lint not found, skipping linting"; \
+	fi
 
 fmt: ## Format code
 	@echo "Formatting code..."
