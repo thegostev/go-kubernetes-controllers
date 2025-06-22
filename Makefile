@@ -9,7 +9,7 @@ GO_VERSION=1.24.4
 # Build flags
 LDFLAGS=-ldflags "-X main.version=$(shell git describe --tags --always --dirty)"
 
-.PHONY: help build clean test docker-build docker-run docker-push lint fmt vet
+.PHONY: help build clean test docker-build docker-run lint fmt vet
 
 # Default target
 help: ## Show this help message
@@ -61,10 +61,6 @@ docker-build: ## Build Docker image
 docker-run: ## Run Docker container
 	@echo "Running Docker container..."
 	docker run -p 8080:8080 $(DOCKER_IMAGE):$(DOCKER_TAG)
-
-docker-push: ## Push Docker image
-	@echo "Pushing Docker image..."
-	docker push $(DOCKER_IMAGE):$(DOCKER_TAG)
 
 install: ## Install dependencies
 	@echo "Installing dependencies..."
