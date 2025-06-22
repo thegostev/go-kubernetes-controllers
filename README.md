@@ -1,3 +1,5 @@
+![Kubernetes Controllers on Go](https://github.com/user-attachments/assets/7cf40135-2f13-4204-85a3-5c1d8d20f44b)
+
 # Go Kubernetes Controllers
 
 A toolkit for building custom Kubernetes controllers and operators in Go. Designed for teams that need more control over their cluster automation than what's available off the shelf.
@@ -158,9 +160,6 @@ curl -i http://localhost:8080/
 The GitHub Actions workflow includes:
 
 - **Test Job**: Runs tests, linting, formatting checks, and vet
-- **Build Job**: Builds the binary and uploads artifacts
-- **Docker Job**: Builds and pushes Docker image with security scanning
-- **Helm Job**: Packages and uploads Helm chart artifacts
 
 **Required Secrets:**
 - `DOCKER_USERNAME` - Docker Hub username
@@ -189,14 +188,6 @@ Response times for the HTTP API are typically under 1ms for simple operations. T
 Most existing solutions either oversimplify things to the point of being useless, or they're so complex that you spend more time fighting the framework than solving your actual problems.
 
 This project hits the middle ground. It gives you working code that handles the boring parts (RBAC, metrics, leader election, CI/CD, containerization) while staying out of your way when you need to implement custom logic.
-
-## Project Status
-
-✅ **Step 1**: Initialize Go CLI app with Cobra  
-✅ **Step 2**: Integrate zerolog for structured logging  
-✅ **Step 3**: Add log level flag support  
-✅ **Step 4**: Add FastHTTP server command  
-✅ **Step 5**: Add Makefile, Dockerfile, GitHub Actions CI/CD, and Helm chart  
 
 ---
 
