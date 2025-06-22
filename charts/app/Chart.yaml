@@ -1,0 +1,16 @@
+apiVersion: v2
+name: go-kubernetes-controllers
+description: A Helm chart for Go Kubernetes Controllers
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - kubernetes
+  - controller
+  - golang
+home: https://github.com/yourusername/go-kubernetes-controllers
+sources:
+  - https://github.com/yourusername/go-kubernetes-controllers
+maintainers:
+  - name: Your Name
+    email: your.email@example.com 

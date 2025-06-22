@@ -50,4 +50,18 @@ Thumbs.db
 
 # Temporary files
 tmp/
-temp/ 
+temp/
+
+# Coverage reports
+coverage.out
+coverage.html
+
+# Helm chart packages
+charts/*.tgz
+charts/index.yaml
+
+# Docker
+.dockerignore
+
+# CI/CD artifacts
+dist/ 
