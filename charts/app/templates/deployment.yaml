@@ -52,11 +52,11 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           args:
-            - "server"
-            - "--port"
-            - "{{ .Values.config.port | quote }}"
-            - "--log-level"
-            - "{{ .Values.config.logLevel }}"
+            - server
+            - --port
+            - {{ .Values.config.port | quote }}
+            - --log-level
+            - {{ .Values.config.logLevel }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
