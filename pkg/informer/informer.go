@@ -71,11 +71,15 @@ func NewInformer(clientset *kubernetes.Clientset, config *types.InformerConfig) 
 	}
 
 	// Register event handlers
-	deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	_, err := deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    informer.handleAdd,
 		UpdateFunc: informer.handleUpdate,
 		DeleteFunc: informer.handleDelete,
 	})
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to add event handlers")
+		return nil, errors.NewConfigError("failed to add event handlers", err)
+	}
 
 	// Create event workers
 	informer.workers = make([]*EventWorker, config.Workers)
