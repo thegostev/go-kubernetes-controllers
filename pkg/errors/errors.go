@@ -21,6 +21,24 @@ type (
 		Field   string
 		Message string
 	}
+
+	// WatchError represents watch stream failures
+	WatchError struct {
+		Message string
+		Err     error
+	}
+
+	// CacheError represents cache corruption or storage issues
+	CacheError struct {
+		Message string
+		Err     error
+	}
+
+	// ResyncError represents resync operation failures
+	ResyncError struct {
+		Message string
+		Err     error
+	}
 )
 
 // Error implementations
@@ -42,6 +60,27 @@ func (e *ValidationError) Error() string {
 	return fmt.Sprintf("validation error for field '%s': %s", e.Field, e.Message)
 }
 
+func (e *WatchError) Error() string {
+	if e.Err != nil {
+		return fmt.Sprintf("watch error: %s: %v", e.Message, e.Err)
+	}
+	return fmt.Sprintf("watch error: %s", e.Message)
+}
+
+func (e *CacheError) Error() string {
+	if e.Err != nil {
+		return fmt.Sprintf("cache error: %s: %v", e.Message, e.Err)
+	}
+	return fmt.Sprintf("cache error: %s", e.Message)
+}
+
+func (e *ResyncError) Error() string {
+	if e.Err != nil {
+		return fmt.Sprintf("resync error: %s: %v", e.Message, e.Err)
+	}
+	return fmt.Sprintf("resync error: %s", e.Message)
+}
+
 // Helper functions to create errors
 func NewConfigError(message string, err error) *ConfigError {
 	return &ConfigError{Message: message, Err: err}
@@ -53,4 +92,16 @@ func NewConnectionError(message string, err error) *ConnectionError {
 
 func NewValidationError(field, message string) *ValidationError {
 	return &ValidationError{Field: field, Message: message}
+}
+
+func NewWatchError(message string, err error) *WatchError {
+	return &WatchError{Message: message, Err: err}
+}
+
+func NewCacheError(message string, err error) *CacheError {
+	return &CacheError{Message: message, Err: err}
+}
+
+func NewResyncError(message string, err error) *ResyncError {
+	return &ResyncError{Message: message, Err: err}
 }
