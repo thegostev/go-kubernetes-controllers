@@ -10,68 +10,32 @@ import (
 
 var port int
 
-// serverCmd represents the server command
 var serverCmd = &cobra.Command{
 	Use:   "server",
 	Short: "Start a FastHTTP server",
-	Long: `Start a FastHTTP server with configurable port and log level.
-The server will respond with "Hello from FastHTTP!" to any request.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		startServer()
-	},
+	Run:   func(cmd *cobra.Command, args []string) { startServer() },
 }
 
 func init() {
 	rootCmd.AddCommand(serverCmd)
-
-	// Add port flag
 	serverCmd.Flags().IntVarP(&port, "port", "p", 8080, "Port to run the server on")
 }
 
 func startServer() {
 	addr := ":" + strconv.Itoa(port)
+	log.Info().Str("component", "server").Int("port", port).Msg("Starting server")
 
-	log.Info().
-		Str("component", "server").
-		Int("port", port).
-		Str("address", addr).
-		Msg("Starting FastHTTP server")
-
-	// Define request handler
 	handler := func(ctx *fasthttp.RequestCtx) {
-		log.Debug().
-			Str("method", string(ctx.Method())).
-			Str("path", string(ctx.Path())).
-			Str("remote_addr", ctx.RemoteAddr().String()).
-			Msg("Request received")
-
-		// Set response headers
+		log.Debug().Str("method", string(ctx.Method())).Str("path", string(ctx.Path())).Msg("Request")
 		ctx.SetContentType("text/plain; charset=utf-8")
-
-		// Send response
 		if _, err := ctx.WriteString("Hello from FastHTTP!"); err != nil {
-			log.Error().Err(err).Msg("Failed to write response")
-			return
+			log.Error().Err(err).Msg("Write failed")
 		}
-
-		log.Debug().
-			Str("method", string(ctx.Method())).
-			Str("path", string(ctx.Path())).
-			Int("status_code", ctx.Response.StatusCode()).
-			Msg("Response sent")
 	}
 
-	// Start server
-	log.Info().
-		Str("component", "server").
-		Str("address", addr).
-		Msg("Server is ready to accept connections")
+	log.Info().Str("component", "server").Str("address", addr).Msg("Server is ready to accept connections")
 
 	if err := fasthttp.ListenAndServe(addr, handler); err != nil {
-		log.Fatal().
-			Err(err).
-			Str("component", "server").
-			Str("address", addr).
-			Msg("Failed to start server")
+		log.Fatal().Err(err).Msg("Server failed")
 	}
 }
