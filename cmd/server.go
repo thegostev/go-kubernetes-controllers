@@ -87,7 +87,7 @@ func startServer() {
 			if err != nil {
 				ctx.SetStatusCode(fasthttp.StatusInternalServerError)
 				ctx.SetContentType("application/json")
-				ctx.Write([]byte(`{"error":"failed to list deployments"}`))
+				_, _ = ctx.Write([]byte(`{"error":"failed to list deployments"}`))
 				return
 			}
 			ctx.SetContentType("application/json")
@@ -95,14 +95,15 @@ func startServer() {
 			enc.SetIndent("", "  ")
 			if err := enc.Encode(deployments); err != nil {
 				ctx.SetStatusCode(fasthttp.StatusInternalServerError)
-				ctx.Write([]byte(`{"error":"failed to encode deployments"}`))
+				ctx.SetContentType("application/json")
+				_, _ = ctx.Write([]byte(`{"error":"failed to encode deployments"}`))
 			}
 			return
 		}
 
 		// Default root handler
 		ctx.SetContentType("text/plain; charset=utf-8")
-		ctx.WriteString("Hello from FastHTTP!")
+		_, _ = ctx.WriteString("Hello from FastHTTP!")
 	}
 
 	logger.Info().Str("address", addr).Msg("Server is ready to accept connections")
