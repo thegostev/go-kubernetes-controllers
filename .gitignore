@@ -65,4 +65,7 @@ charts/index.yaml
 .dockerignore
 
 # CI/CD artifacts
-dist/ 
+dist/
+
+# Negation rule
+!pkg/controller/ 
