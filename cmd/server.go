@@ -1,21 +1,16 @@
 package cmd
 
 import (
-	"context"
-	"encoding/json"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
-	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/valyala/fasthttp"
 
-	"github.com/thegostev/go-kubernetes-controllers/internal/types"
 	"github.com/thegostev/go-kubernetes-controllers/pkg/controller"
-	"github.com/thegostev/go-kubernetes-controllers/pkg/informer"
 	"github.com/thegostev/go-kubernetes-controllers/pkg/k8s"
 
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -51,42 +46,10 @@ func startServer() {
 		logger.Fatal().Err(err).Msg("unable to setup deployment controller")
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	// Start controller-runtime manager in background
 	go func() {
 		if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 			logger.Fatal().Err(err).Msg("controller-runtime manager failed")
-		}
-	}()
-
-	// --- Informer and client setup ---
-	clientConfig := &types.ClientConfig{
-		KubeconfigPath: "", // default kubeconfig
-		Timeout:        30 * time.Second,
-	}
-	client, err := k8s.NewClient(clientConfig)
-	if err != nil {
-		logger.Fatal().Err(err).Msg("failed to create kubernetes client")
-	}
-	informerConfig := &types.InformerConfig{
-		Namespace:       "default",
-		ResyncPeriod:    10 * time.Minute,
-		Workers:         2,
-		MaxCacheSize:    1000,
-		MaxConnections:  10,
-		EventBufferSize: 100,
-	}
-	inf, err := informer.NewInformer(client.GetClientset(), informerConfig)
-	if err != nil {
-		logger.Fatal().Err(err).Msg("failed to create informer")
-	}
-
-	// Start informer in background
-	go func() {
-		if err := inf.Start(ctx); err != nil {
-			logger.Fatal().Err(err).Msg("informer failed")
 		}
 	}()
 
@@ -96,7 +59,6 @@ func startServer() {
 	go func() {
 		sig := <-sigChan
 		logger.Info().Str("signal", sig.String()).Msg("received shutdown signal")
-		cancel()
 	}()
 
 	// --- FastHTTP handler with simple router ---
@@ -104,25 +66,6 @@ func startServer() {
 		path := string(ctx.Path())
 		method := string(ctx.Method())
 		logger.Debug().Str("method", method).Str("path", path).Msg("Request")
-
-		if path == "/api/deployments" && method == fasthttp.MethodGet {
-			deployments, err := inf.ListDeployments()
-			if err != nil {
-				ctx.SetStatusCode(fasthttp.StatusInternalServerError)
-				ctx.SetContentType("application/json")
-				_, _ = ctx.Write([]byte(`{"error":"failed to list deployments"}`))
-				return
-			}
-			ctx.SetContentType("application/json")
-			enc := json.NewEncoder(ctx)
-			enc.SetIndent("", "  ")
-			if err := enc.Encode(deployments); err != nil {
-				ctx.SetStatusCode(fasthttp.StatusInternalServerError)
-				ctx.SetContentType("application/json")
-				_, _ = ctx.Write([]byte(`{"error":"failed to encode deployments"}`))
-			}
-			return
-		}
 
 		// Default root handler
 		ctx.SetContentType("text/plain; charset=utf-8")
@@ -133,9 +76,4 @@ func startServer() {
 	if err := fasthttp.ListenAndServe(addr, handler); err != nil {
 		logger.Fatal().Err(err).Msg("Server failed")
 	}
-
-	// On shutdown, stop informer
-	stopCtx, stopCancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer stopCancel()
-	_ = inf.Stop(stopCtx)
 }
