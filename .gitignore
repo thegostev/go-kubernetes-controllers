@@ -30,6 +30,7 @@ controller.windows
 *.swp
 *.swo
 *~
+.cursorrules
 
 # OS generated files
 .DS_Store

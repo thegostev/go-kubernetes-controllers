@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 
@@ -88,4 +89,13 @@ func (c *Client) HealthCheck(ctx context.Context) error {
 
 	c.logger.Debug().Msg("health check successful")
 	return nil
+}
+
+func NewConfigOrDie() *rest.Config {
+	kubeconfig := "" // TODO: optionally load from env or flag
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	if err != nil {
+		panic(err)
+	}
+	return config
 }

@@ -14,8 +14,12 @@ import (
 	"github.com/valyala/fasthttp"
 
 	"github.com/yourusername/k8s-controller-tutorial/internal/types"
+	"github.com/yourusername/k8s-controller-tutorial/pkg/controller"
 	"github.com/yourusername/k8s-controller-tutorial/pkg/informer"
 	"github.com/yourusername/k8s-controller-tutorial/pkg/k8s"
+	"go.uber.org/zap"
+	appsv1 "k8s.io/api/apps/v1"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 var port int
@@ -34,6 +38,34 @@ func init() {
 func startServer() {
 	addr := ":" + strconv.Itoa(port)
 	logger := log.With().Str("component", "server").Int("port", port).Logger()
+
+	// --- Controller-runtime manager and controller setup ---
+	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
+	mgr, err := controller.NewManager(k8s.NewConfigOrDie(), controller.Options{
+		Scheme: k8s.NewScheme(),
+	})
+	if err != nil {
+		logger.Fatal().Err(err).Msg("unable to start controller-runtime manager")
+	}
+	c, err := controller.New("deployment-controller", mgr, controller.Options{
+		Reconciler: &controller.DeploymentReconciler{Client: mgr.GetClient()},
+	})
+	if err != nil {
+		logger.Fatal().Err(err).Msg("unable to create deployment controller")
+	}
+	if err := c.Watch(&source.Kind{Type: &appsv1.Deployment{}}, controller.DeploymentEventHandler); err != nil {
+		logger.Fatal().Err(err).Msg("unable to watch Deployments")
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Start controller-runtime manager in background
+	go func() {
+		if err := mgr.Start(controller.SetupSignalHandler()); err != nil {
+			logger.Fatal().Err(err).Msg("controller-runtime manager failed")
+		}
+	}()
 
 	// --- Informer and client setup ---
 	clientConfig := &types.ClientConfig{
@@ -56,9 +88,6 @@ func startServer() {
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed to create informer")
 	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	// Start informer in background
 	go func() {
