@@ -1,5 +1,5 @@
 package main
 
-import "github.com/yourusername/k8s-controller-tutorial/cmd"
+import "github.com/thegostev/go-kubernetes-controllers/cmd"
 
 func main() { cmd.Execute() }

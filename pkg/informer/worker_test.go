@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/rs/zerolog"
-	"github.com/yourusername/k8s-controller-tutorial/internal/types"
+	"github.com/thegostev/go-kubernetes-controllers/internal/types"
 )
 
 func TestEventWorkerProcessesEvents(t *testing.T) {

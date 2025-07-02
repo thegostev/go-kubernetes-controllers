@@ -5,7 +5,7 @@ import (
 
 	"github.com/rs/zerolog"
 
-	"github.com/yourusername/k8s-controller-tutorial/internal/types"
+	"github.com/thegostev/go-kubernetes-controllers/internal/types"
 )
 
 // EventWorker processes events asynchronously

@@ -11,9 +11,9 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"github.com/yourusername/k8s-controller-tutorial/internal/types"
-	"github.com/yourusername/k8s-controller-tutorial/pkg/informer"
-	"github.com/yourusername/k8s-controller-tutorial/pkg/k8s"
+	"github.com/thegostev/go-kubernetes-controllers/internal/types"
+	"github.com/thegostev/go-kubernetes-controllers/pkg/informer"
+	"github.com/thegostev/go-kubernetes-controllers/pkg/k8s"
 )
 
 var (

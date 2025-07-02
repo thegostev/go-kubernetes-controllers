@@ -3,7 +3,7 @@ package types
 import (
 	"time"
 
-	"github.com/yourusername/k8s-controller-tutorial/pkg/errors"
+	"github.com/thegostev/go-kubernetes-controllers/pkg/errors"
 )
 
 // ListOptions represents options for listing resources

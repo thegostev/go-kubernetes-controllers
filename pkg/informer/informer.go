@@ -12,8 +12,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/yourusername/k8s-controller-tutorial/internal/types"
-	"github.com/yourusername/k8s-controller-tutorial/pkg/errors"
+	"github.com/thegostev/go-kubernetes-controllers/internal/types"
+	"github.com/thegostev/go-kubernetes-controllers/pkg/errors"
 )
 
 // Informer represents a Kubernetes deployment informer

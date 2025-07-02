@@ -13,13 +13,13 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/valyala/fasthttp"
 
-	"github.com/yourusername/k8s-controller-tutorial/internal/types"
-	"github.com/yourusername/k8s-controller-tutorial/pkg/controller"
-	"github.com/yourusername/k8s-controller-tutorial/pkg/informer"
-	"github.com/yourusername/k8s-controller-tutorial/pkg/k8s"
-	"go.uber.org/zap"
-	appsv1 "k8s.io/api/apps/v1"
-	"sigs.k8s.io/controller-runtime/pkg/source"
+	"github.com/thegostev/go-kubernetes-controllers/internal/types"
+	"github.com/thegostev/go-kubernetes-controllers/pkg/controller"
+	"github.com/thegostev/go-kubernetes-controllers/pkg/informer"
+	"github.com/thegostev/go-kubernetes-controllers/pkg/k8s"
+
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
 var port int
@@ -41,20 +41,14 @@ func startServer() {
 
 	// --- Controller-runtime manager and controller setup ---
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
-	mgr, err := controller.NewManager(k8s.NewConfigOrDie(), controller.Options{
+	mgr, err := ctrl.NewManager(k8s.NewConfigOrDie(), ctrl.Options{
 		Scheme: k8s.NewScheme(),
 	})
 	if err != nil {
 		logger.Fatal().Err(err).Msg("unable to start controller-runtime manager")
 	}
-	c, err := controller.New("deployment-controller", mgr, controller.Options{
-		Reconciler: &controller.DeploymentReconciler{Client: mgr.GetClient()},
-	})
-	if err != nil {
-		logger.Fatal().Err(err).Msg("unable to create deployment controller")
-	}
-	if err := c.Watch(&source.Kind{Type: &appsv1.Deployment{}}, controller.DeploymentEventHandler); err != nil {
-		logger.Fatal().Err(err).Msg("unable to watch Deployments")
+	if err := controller.SetupDeploymentController(mgr); err != nil {
+		logger.Fatal().Err(err).Msg("unable to setup deployment controller")
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -62,7 +56,7 @@ func startServer() {
 
 	// Start controller-runtime manager in background
 	go func() {
-		if err := mgr.Start(controller.SetupSignalHandler()); err != nil {
+		if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 			logger.Fatal().Err(err).Msg("controller-runtime manager failed")
 		}
 	}()

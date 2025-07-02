@@ -6,8 +6,8 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/yourusername/k8s-controller-tutorial/internal/types"
-	"github.com/yourusername/k8s-controller-tutorial/pkg/errors"
+	"github.com/thegostev/go-kubernetes-controllers/internal/types"
+	"github.com/thegostev/go-kubernetes-controllers/pkg/errors"
 )
 
 // ListDeployments lists deployments in the specified namespace with context and timeout

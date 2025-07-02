@@ -15,7 +15,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 
-	"github.com/yourusername/k8s-controller-tutorial/internal/types"
+	"github.com/thegostev/go-kubernetes-controllers/internal/types"
 )
 
 func TestInformerReceivesDeploymentEvents(t *testing.T) {

@@ -11,8 +11,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 
-	"github.com/yourusername/k8s-controller-tutorial/internal/types"
-	"github.com/yourusername/k8s-controller-tutorial/pkg/errors"
+	"github.com/thegostev/go-kubernetes-controllers/internal/types"
+	"github.com/thegostev/go-kubernetes-controllers/pkg/errors"
 )
 
 // Client represents a Kubernetes client
