@@ -1,92 +1,136 @@
 ![Kubernetes Controllers on Go](https://github.com/user-attachments/assets/7cf40135-2f13-4204-85a3-5c1d8d20f44b)
 
+
+
+[![Build Status](https://github.com/thegostev/go-kubernetes-controllers/actions/workflows/ci.yml/badge.svg)](https://github.com/thegostev/go-kubernetes-controllers/actions)
+[![Go Version](https://img.shields.io/badge/go-1.24+-blue.svg)](https://golang.org/dl/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/thegostev/go-kubernetes-controllers/pulls)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 # Go Kubernetes Controllers
 
-A toolkit for building custom Kubernetes controllers and operators in Go. Designed for teams that need more control over their cluster automation than what's available off the shelf.
+A toolkit for building Kubernetes controllers and operators in Go.  
+Designed for teams who need production-grade automation and observability in their clusters.
 
-## What this is
+---
 
-This project gives you a solid foundation for writing your own Kubernetes controllers. Instead of wrestling with boilerplate code every time you need custom cluster behavior, you get working examples of the patterns that can be leveraged in production.
+## Features
 
-The codebase covers everything from basic CLI tools to multi-cluster management, with real implementations you can modify for your specific needs. No theoretical examples or toy demos.
+- Easy CLI with Cobra.
+- Leader election for HA deployments.
+- Helm chart for Kubernetes deployment.
+- Structured logging and Prometheus metrics.
+- Event-driven controller-runtime architecture.
 
-## Getting started
+---
 
-```bash
-# Build
+## Quick Start
+
+```sh
+git clone https://github.com/thegostev/go-kubernetes-controllers.git
+cd go-kubernetes-controllers
 go build -o controller .
 
-# List deployments
-./controller list
+# Run locally (no leader election)
+./controller server --disable-leader-election
 
-# Watch deployment events
-./controller watch
-
-# Start HTTP server
+# Run in cluster (with leader election)
 ./controller server
 ```
 
-## Commands
+---
+
+## Usage
 
 ### List Deployments
-```bash
+
+```sh
 ./controller list --namespace default
 ./controller list --kubeconfig /path/to/kubeconfig
 ./controller list --timeout 60s
 ```
 
-### Watch Events
-```bash
+### Watch Deployment Events
+
+```sh
 ./controller watch --namespace kube-system
 ./controller watch --workers 4 --resync 5m
 ./controller watch --in-cluster
 ```
 
-### HTTP Server
-```bash
+### Start Controller Manager
+
+```sh
+./controller server --disable-leader-election --metrics-port 9000
+```
+
+### HTTP Server (legacy)
+
+```sh
 ./controller server --port 8080
 curl http://localhost:8080/  # Returns "Hello from FastHTTP!"
 ```
 
 ### Global Options
-```bash
+
+```sh
 --log-level string   Set log level: trace, debug, info, warn, error (default "info")
 ```
 
-## Key Features
+---
 
-- **Event-Driven**: Kubernetes informer with multi-worker event processing
-- **Error Handling**: Custom error types with proper validation
-- **Structured Logging**: Zerolog integration with configurable levels
-- **CLI Interface**: Cobra-based commands for list, watch, and server
-- **Testing**: Unit and integration tests with envtest
+## Configuration
 
-## Development
+| Flag                        | Description                          | Default   |
+|-----------------------------|--------------------------------------|-----------|
+| `--disable-leader-election` | Disable leader election (dev only)   | `false`   |
+| `--metrics-port`            | Metrics endpoint port (if supported) | `8081`    |
+| `--log-level`               | Log level (trace, debug, info, ...)  | `info`    |
+| `--namespace`               | Namespace for list/watch commands    | `default` |
+| `--kubeconfig`              | Path to kubeconfig file              | `~/.kube/config` |
 
-```bash
-# Run tests
-go test ./...
-
-# Integration tests
-go test -tags=integration ./pkg/informer/
-
-# Development
-go run main.go watch --namespace default --log-level debug
-```
+---
 
 ## Architecture
 
-```
-Kubernetes API → Informer → Event Queue → Workers → Processing
+Kubernetes API → controller-runtime Manager → Controllers → Reconcile Loop → Logging/Metrics
+
+- Modular: `cmd/` for CLI, `pkg/` for controllers, informers, k8s clients, `internal/` for types/validation.
+- Clean separation of concerns and testable interfaces.
+
+---
+
+## Development
+
+```sh
+# Run all tests and lints
+make install test lint fmt vet build
 ```
 
-## Dependencies
+Integration tests (envtest):
+```sh
+go test -tags=integration ./pkg/controller/
+```
 
-- **Go 1.24+** - Language runtime
-- **k8s.io/client-go v0.33.0** - Kubernetes client
-- **github.com/spf13/cobra** - CLI framework
-- **github.com/rs/zerolog** - Structured logging
-- **github.com/valyala/fasthttp** - HTTP server
+---
+
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on code style, PR process, and how to get started.
+
+---
+
+## License
+
+[MIT](LICENSE)
+
+---
+
+## Links
+
+- [Issues](https://github.com/thegostev/go-kubernetes-controllers/issues)
+- [GitHub Actions CI](https://github.com/thegostev/go-kubernetes-controllers/actions)
+- [Helm Chart](./charts/app/)
 
 ---
 
