@@ -10,6 +10,6 @@ import (
 func NewScheme() *runtime.Scheme {
 	scheme := runtime.NewScheme()
 	_ = appsv1.AddToScheme(scheme)
-	_ = v1alpha1.AddToScheme(scheme)  // Add FrontendPage types
+	_ = v1alpha1.AddToScheme(scheme) // Add FrontendPage types
 	return scheme
 }

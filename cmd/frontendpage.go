@@ -95,6 +95,6 @@ func displayFrontendPages(frontendPages *v1alpha1.FrontendPageList, namespace st
 func init() {
 	rootCmd.AddCommand(frontendPageCmd)
 	frontendPageCmd.AddCommand(listFrontendPageCmd)
-	
+
 	listFrontendPageCmd.Flags().StringVar(&frontendPageNamespace, "namespace", "", "Namespace to list frontend pages from (default: default)")
 }

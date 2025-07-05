@@ -36,8 +36,23 @@ jobs:
     - name: Install dependencies
       run: make install
 
-    - name: Run tests
-      run: make test
+    - name: Dependency Check (go mod tidy)
+      run: |
+        go mod tidy
+        if [ -n "$(git status --porcelain go.mod go.sum)" ]; then
+          echo "Dependencies are not tidy. Please run 'go mod tidy' and commit changes."
+          git --no-pager diff go.mod go.sum
+          exit 1
+        fi
+
+    - name: Run code formatting check
+      run: |
+        make fmt
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "Code is not formatted. Please run 'make fmt' and commit the changes."
+          git --no-pager diff
+          exit 1
+        fi
 
     - name: Install golangci-lint
       uses: golangci/golangci-lint-action@v4
@@ -47,16 +62,8 @@ jobs:
     - name: Run linting
       run: make lint
 
-    - name: Run code formatting check
-      run: |
-        make fmt
-        if [ -n "$(git status --porcelain)" ]; then
-          echo "Code is not formatted. Please run 'make fmt'"
-          exit 1
-        fi
-
-    - name: Run vet
-      run: make vet
+    - name: Run tests
+      run: make test
 
     - name: Build binary
       run: make build
@@ -75,4 +82,12 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: controller-binary
-        path: controller 
+        path: controller
+
+    - name: Cleanliness Check (no uncommitted changes)
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "Uncommitted changes detected after build. Please investigate."
+          git --no-pager diff
+          exit 1
+        fi 
