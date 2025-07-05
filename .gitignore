@@ -18,11 +18,6 @@
 go.work
 
 # Build artifacts
-controller
-controller.exe
-controller.darwin
-controller.linux
-controller.windows
 
 # IDE and editor files
 .vscode/

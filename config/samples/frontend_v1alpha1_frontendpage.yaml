@@ -1,0 +1,22 @@
+apiVersion: frontend.thegostev.com/v1alpha1
+kind: FrontendPage
+metadata:
+  name: example-dashboard
+  namespace: default
+spec:
+  title: "Example Dashboard"
+  template: "dashboard"
+  theme: "light"
+  components:
+    - name: "metrics-table"
+      type: "table"
+      config:
+        columns: ["Name", "Value", "Status"]
+    - name: "status-chart"
+      type: "chart"
+      config:
+        type: "line"
+    - name: "action-buttons"
+      type: "button"
+      config:
+        actions: ["refresh", "export"]

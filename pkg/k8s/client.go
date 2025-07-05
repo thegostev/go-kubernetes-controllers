@@ -17,8 +17,9 @@ import (
 
 // Client represents a Kubernetes client
 type Client struct {
-	clientset *kubernetes.Clientset
-	logger    zerolog.Logger
+	clientset  *kubernetes.Clientset
+	logger     zerolog.Logger
+	restConfig *rest.Config
 }
 
 // NewClient creates a new Kubernetes client
@@ -59,8 +60,9 @@ func NewClient(config *types.ClientConfig) (*Client, error) {
 	logger.Info().Msg("kubernetes client initialized successfully")
 
 	return &Client{
-		clientset: clientset,
-		logger:    logger,
+		clientset:  clientset,
+		logger:     logger,
+		restConfig: clientConfig,
 	}, nil
 }
 
@@ -92,8 +94,9 @@ func (c *Client) HealthCheck(ctx context.Context) error {
 }
 
 func NewConfigOrDie() *rest.Config {
-	kubeconfig := "" // TODO: optionally load from env or flag
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	// Use the default kubeconfig path
+	kubeconfigPath := filepath.Join(homedir.HomeDir(), ".kube", "config")
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		panic(err)
 	}

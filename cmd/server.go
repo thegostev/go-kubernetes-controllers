@@ -31,6 +31,9 @@ var serverCmd = &cobra.Command{
 		if err := controller.SetupDeploymentController(mgr); err != nil {
 			return err
 		}
+		if err := controller.SetupFrontendPageController(mgr); err != nil {
+			return err
+		}
 		return mgr.Start(ctrl.SetupSignalHandler())
 	},
 }

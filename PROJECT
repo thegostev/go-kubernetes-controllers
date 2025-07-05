@@ -1,0 +1,6 @@
+domain: thegostev.com
+layout:
+- go.kubebuilder.io/v4
+projectName: go-kubernetes-controllers
+repo: github.com/thegostev/go-kubernetes-controllers
+version: "4" 

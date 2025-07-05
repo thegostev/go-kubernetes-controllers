@@ -4,12 +4,11 @@
 BINARY_NAME=controller
 DOCKER_IMAGE=go-kubernetes-controllers
 DOCKER_TAG=latest
-GO_VERSION=1.24.4
 
 # Build flags
 LDFLAGS=-ldflags "-X main.version=$(shell git describe --tags --always --dirty)"
 
-.PHONY: help build clean test docker-build docker-run lint fmt vet
+.PHONY: help build clean test docker-build docker-run lint fmt vet install dev all install-crd uninstall-crd test-frontendpage
 
 # Default target
 help: ## Show this help message
@@ -26,6 +25,7 @@ clean: ## Clean build artifacts
 	@echo "Cleaning build artifacts..."
 	rm -f $(BINARY_NAME)
 	rm -rf dist/
+	rm -f coverage.out coverage.html
 	go clean -cache -testcache
 
 test: ## Run tests
@@ -71,4 +71,17 @@ dev: ## Run in development mode
 	@echo "Running in development mode..."
 	go run main.go server --port 8080 --log-level debug
 
-all: clean install test build ## Clean, install, test, and build 
+all: clean install test build ## Clean, install, test, and build
+
+install-crd: ## Install FrontendPage CRD
+	@echo "Installing FrontendPage CRD..."
+	kubectl apply -f config/crd/frontendpages.yaml
+
+uninstall-crd: ## Uninstall FrontendPage CRD
+	@echo "Uninstalling FrontendPage CRD..."
+	kubectl delete -f config/crd/frontendpages.yaml --ignore-not-found=true
+
+test-frontendpage: install-crd ## Test FrontendPage functionality
+	@echo "Testing FrontendPage functionality..."
+	@echo "Run: ./controller server"
+	@echo "Then in another terminal: ./controller frontendpage list"
