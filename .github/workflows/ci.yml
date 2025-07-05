@@ -65,6 +65,14 @@ jobs:
     - name: Run tests
       run: make test
 
+    - name: Cleanliness Check (no uncommitted changes in source)
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "Uncommitted changes detected in source code. Please investigate."
+          git --no-pager diff
+          exit 1
+        fi
+
     - name: Build binary
       run: make build
 
@@ -84,10 +92,4 @@ jobs:
         name: controller-binary
         path: controller
 
-    - name: Cleanliness Check (no uncommitted changes)
-      run: |
-        if [ -n "$(git status --porcelain)" ]; then
-          echo "Uncommitted changes detected after build. Please investigate."
-          git --no-pager diff
-          exit 1
-        fi 
+ 
